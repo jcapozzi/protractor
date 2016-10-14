@@ -32,9 +32,9 @@ exports.config = {
   // Alternatively, you could specify one root element application, to test
   // against only that one:
   // rootElement: 'async-app'
-  allScriptsTimeout: 120000,
-  getPageTimeout: 120000,
+  allScriptsTimeout: 10000,
+  getPageTimeout: 20000,
   jasmineNodeOpts: {
-    defaultTimeoutInterval: 120000
+    defaultTimeoutInterval: 10000
   }
 };

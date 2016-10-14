@@ -10,14 +10,39 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 var core_1 = require('@angular/core');
 var AppComponent = (function () {
-    function AppComponent() {
+    function AppComponent(element) {
+        this.element = element;
     }
+    AppComponent.prototype.ngAfterContentInit = function () {
+        var _this = this;
+        var scene, camera, renderer, geometry, material, mesh, temp = this.element;
+        var init = function () {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+            camera.position.z = 1000;
+            geometry = new THREE.BoxGeometry(200, 200, 200);
+            material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
+            mesh = new THREE.Mesh(geometry, material);
+            scene.add(mesh);
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            _this.element.nativeElement.appendChild(renderer.domElement);
+        };
+        var animate = function () {
+            requestAnimationFrame(animate);
+            mesh.rotation.x += 0.01;
+            mesh.rotation.y += 0.02;
+            renderer.render(scene, camera);
+        };
+        init();
+        animate();
+    };
     AppComponent = __decorate([
         core_1.Component({
             selector: 'my-app',
             templateUrl: 'app/app.component.html'
         }), 
-        __metadata('design:paramtypes', [])
+        __metadata('design:paramtypes', [core_1.ElementRef])
     ], AppComponent);
     return AppComponent;
 }());
