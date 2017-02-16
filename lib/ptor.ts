@@ -1,5 +1,6 @@
-import {ActionSequence, Browser, Builder, Button, Capabilities, Capability, Command, CommandName, error, EventEmitter, FileDetector, Key, logging, promise, Session, until, WebDriver, WebElement, WebElementPromise} from 'selenium-webdriver';
-import * as chrome from 'selenium-webdriver/firefox';
+import * as webdriver from 'selenium-webdriver';
+import * as chrome from 'selenium-webdriver/chrome';
+import * as firefox from 'selenium-webdriver/firefox';
 import * as http from 'selenium-webdriver/http';
 import * as remote from 'selenium-webdriver/remote';
 
@@ -7,8 +8,6 @@ import {ElementHelper, ProtractorBrowser} from './browser';
 import {ElementArrayFinder, ElementFinder} from './element';
 import {ProtractorExpectedConditions} from './expectedConditions';
 import {ProtractorBy} from './locators';
-
-let webdriver = require('selenium-webdriver');
 
 export class Ptor {
   // Variables tied to the global namespace.
@@ -32,8 +31,7 @@ export class Ptor {
   ElementFinder = require('./element').ElementFinder;
   ElementArrayFinder = require('./element').ElementArrayFinder;
   ProtractorBy = require('./locators').ProtractorBy;
-  ProtractorExpectedConditions =
-      require('./expectedConditions').ProtractorExpectedConditions;
+  ProtractorExpectedConditions = require('./expectedConditions').ProtractorExpectedConditions;
 
   // Export selenium webdriver.
   ActionSequence = webdriver.ActionSequence;
@@ -55,11 +53,7 @@ export class Ptor {
   until = webdriver.until;
   Command = require('selenium-webdriver/lib/command').Command;
   CommandName = require('selenium-webdriver/lib/command').Name;
-  utils = {
-    firefox: require('selenium-webdriver/firefox'),
-    http: require('selenium-webdriver/http'),
-    remote: require('selenium-webdriver/remote')
-  }
+  utils = {firefox: firefox, http: http, remote: remote, chrome: chrome};
 }
 
-export var protractor = new Ptor();
+export let protractor = new Ptor();

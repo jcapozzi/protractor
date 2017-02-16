@@ -1,11 +1,14 @@
 #!/usr/bin/env node
+var path = require('path');
 
 var Executor = require('./test/test_util').Executor;
 
 var passingTests = [
   'node built/cli.js spec/basicConf.js',
+  'node built/cli.js spec/basicConf.js --useBlockingProxy',
   'node built/cli.js spec/multiConf.js',
   'node built/cli.js spec/altRootConf.js',
+  'node built/cli.js spec/inferRootConf.js',
   'node built/cli.js spec/onCleanUpAsyncReturnValueConf.js',
   'node built/cli.js spec/onCleanUpNoReturnValueConf.js',
   'node built/cli.js spec/onCleanUpSyncReturnValueConf.js',
@@ -28,14 +31,19 @@ var passingTests = [
   'node built/cli.js spec/interactionConf.js',
   'node built/cli.js spec/directConnectConf.js',
   'node built/cli.js spec/restartBrowserBetweenTestsConf.js',
+  'node built/cli.js spec/driverProviderLocalConf.js',
   'node built/cli.js spec/getCapabilitiesConf.js',
   'node built/cli.js spec/controlLockConf.js',
   'node built/cli.js spec/customFramework.js',
   'node built/cli.js spec/noGlobalsConf.js',
   'node built/cli.js spec/angular2Conf.js',
   'node built/cli.js spec/hybridConf.js',
-  'node scripts/attachSession.js',
-  'node scripts/exitCodes.js',
+  'node built/cli.js spec/built/noCFBasicConf.js',
+  'node built/cli.js spec/built/noCFBasicConf.js --useBlockingProxy',
+  'node built/cli.js spec/built/noCFPluginConf.js',
+  'node scripts/driverProviderAttachSession.js',
+  'node scripts/errorTest.js',
+  // Interactive Element Explorer tasks
   'node scripts/interactive_tests/interactive_test.js',
   'node scripts/interactive_tests/with_base_url.js',
   // Unit tests
@@ -71,7 +79,7 @@ executor.addCommandlineTest('node built/cli.js spec/errorTest/timeoutConf.js')
       message: 'Timeout - Async callback was not invoked within timeout ' +
           'specified by jasmine.DEFAULT_TIMEOUT_INTERVAL.'
     })
-    .expectTestDuration(0, 100);
+    .expectTestDuration(0, 1000);
 
 executor.addCommandlineTest('node built/cli.js spec/errorTest/afterLaunchChangesExitCodeConf.js')
     .expectExitCode(11)
@@ -138,7 +146,12 @@ executor.addCommandlineTest('node built/cli.js spec/errorTest/slowHttpAndTimeout
 executor.addCommandlineTest('node built/cli.js spec/angular2TimeoutConf.js')
     .expectExitCode(1)
     .expectErrors([
-      {message: 'Timed out waiting for Protractor to synchronize with the page'},
+      {message: 'Timed out waiting for asynchronous Angular tasks to finish'},
     ]);
 
-executor.execute();
+// If we're running on CircleCI, save stdout and stderr from the test run to a log file.
+if (process.env['CIRCLE_ARTIFACTS']) {
+  executor.execute(path.join(process.env['CIRCLE_ARTIFACTS'], 'test_log.txt'));
+} else {
+  executor.execute();
+}

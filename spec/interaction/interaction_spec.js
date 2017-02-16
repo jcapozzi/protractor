@@ -1,5 +1,3 @@
-var util = require('util');
-
 describe('Browser', function() {
 
   var newBrowser;
@@ -11,7 +9,7 @@ describe('Browser', function() {
     // throughout all of your tests). However, I'm forking browsers in my tests
     // and don't want to pile up my browser count.
     if (newBrowser) {
-      newBrowser.quit().then(function() {
+      newBrowser.quit().then(() => {
         done();
       });
     } else {
@@ -52,7 +50,6 @@ describe('Browser', function() {
 
     var Person = function(name, browser) {
       var $ = browser.$;
-      var $$ = browser.$$;
       var element = browser.element;
 
       this.openApp = function() {

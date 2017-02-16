@@ -5,12 +5,22 @@
   "main": "index.js",
   "scripts": {
     "tsc": "tsc",
-    "test": "protractor conf.js"
+    "test": "protractor tmp/conf.js"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@types/jasmine": "^2.5.38",
+    "@types/selenium-webdriver": "^2.53.39",
     "protractor": "file:../../",
-    "rimraf": "^2.5.4"
+    "q": "^1.4.1",
+    "rimraf": "^2.5.4",
+    "selenium-webdriver": "^3.0.1",
+    "typescript": "~2.0.0"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^2.5.41",
+    "@types/jasminewd2": "^2.0.0",
+    "@types/q": "0.0.32"
   }
 }

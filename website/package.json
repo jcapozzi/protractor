@@ -23,10 +23,11 @@
     "marked": "^0.3.3"
   },
   "scripts": {
-    "prepublish": "node node_modules/bower/bin/bower install",
-    "clean": "gulp clean",
     "build": "gulp",
+    "clean": "gulp clean",
+    "prepublish": "bower install",
+    "prestart": "npm install && npm run prepublish",
     "start": "gulp liveReload",
-    "test": "./run-tests.js"
+    "test": "node run-tests.js"
   }
 }

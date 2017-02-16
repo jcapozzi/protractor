@@ -92,21 +92,21 @@ describe('ElementFinder', function() {
 
   it('should allow handling errors', function() {
     browser.get('index.html#/form');
-    var elmFinder = $('.nopenopenope').getText().then(function(success) {
+    $('.nopenopenope').getText().then(function(/* string */) {
       // This should throw an error. Fail.
       expect(true).toEqual(false);
-    }, function(err) {
+    }, function(/* error */) {
       expect(true).toEqual(true);
     });
   });
 
   it('should allow handling chained errors', function() {
     browser.get('index.html#/form');
-    var elmFinder = $('.nopenopenope').$('furthernope').getText().then(
-      function(success) {
+    $('.nopenopenope').$('furthernope').getText().then(
+      function(/* string */) {
         // This should throw an error. Fail.
         expect(true).toEqual(false);
-      }, function(err) {
+      }, function(/* error */) {
         expect(true).toEqual(true);
       });
   });
@@ -151,13 +151,12 @@ describe('ElementFinder', function() {
 
   it('should propagate exceptions', function() {
     browser.get('index.html#/form');
-    var successful = protractor.promise.defer();
 
     var invalidElement = element(by.binding('INVALID'));
-    invalidElement.getText().then(function(value) {
-      successful.fulfill(true);
-    }, function(err) {
-      successful.fulfill(false);
+    var successful = invalidElement.getText().then(function() {
+      return true;
+    }, function() {
+      return false;
     });
     expect(successful).toEqual(false);
   });
@@ -173,18 +172,15 @@ describe('ElementFinder', function() {
     });
   });
 
-  it('should be usable in WebDriver functions via getWebElement', function() {
-    // TODO(juliemr): should be able to do this without the getWebElement call
+  it('should be usable in WebDriver functions', function() {
     browser.get('index.html#/form');
     var greeting = element(by.binding('greeting'));
-    browser.executeScript(
-        'arguments[0].scrollIntoView', greeting.getWebElement());
+    browser.executeScript('arguments[0].scrollIntoView', greeting);
   });
 
   it('should allow null as success handler', function() {
     browser.get('index.html#/form');
 
-    var usernameInput = element(by.model('username'));
     var name = element(by.binding('username'));
 
     expect(name.getText()).toEqual('Anon');
@@ -361,6 +357,13 @@ describe('ElementArrayFinder', function() {
     expect(element.all(by.binding('doesnotexist')).count()).toEqual(0);
   });
 
+  it('supports isPresent()', function() {
+    browser.get('index.html#/form');
+
+    expect(element.all(by.model('color')).isPresent()).toBeTruthy();
+    expect(element.all(by.binding('doesnotexist')).isPresent()).toBeFalsy();
+  });
+
   it('should return not present when an element disappears within an array',
       function() {
     browser.get('index.html#/form');
@@ -471,14 +474,14 @@ describe('ElementArrayFinder', function() {
     var labels = element.all(by.css('#animals ul li')).map(function(elm) {
       return {
         text: elm.getText(),
-        inner: elm.getInnerHtml()
+        tagName: elm.getTagName()
       };
     });
 
     var newExpected = function(expectedLabel) {
       return {
         text: expectedLabel,
-        inner: expectedLabel
+        tagName: 'li'
       };
     };
 
@@ -494,7 +497,8 @@ describe('ElementArrayFinder', function() {
   it('should map each element from a literal and promise array', function() {
     browser.get('index.html#/form');
     var i = 1;
-    var labels = element.all(by.css('#animals ul li')).map(function(elm) {
+    var labels = element.all(by.css('#animals ul li'))
+        .map(function(/* element */) {
       return i++;
     });
 

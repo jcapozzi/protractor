@@ -36,13 +36,8 @@ describe('require(\'protractor\')', () => {
     });
 
     describe('browser class', () => {
-      it('should have static method defined', () => {
-        var staticMethod = 'wrapDriver';
-        expect(typeof protractor.ProtractorBrowser['wrapDriver']).toEqual('function');
-      });
-
       it('should have static variables defined', () => {
-        var staticVariables = ['By', 'ExpectedConditions'];
+        var staticVariables = ['By'];
         for (var pos in staticVariables) {
           var property = staticVariables[pos];
           expect(typeof protractor.ProtractorBrowser[property]).toEqual('object');

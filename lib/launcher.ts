@@ -2,6 +2,7 @@
  * The launcher is responsible for parsing the capabilities from the
  * input configuration and launching test runners.
  */
+import * as fs from 'fs';
 import * as q from 'q';
 
 import {Config} from './config';
@@ -37,9 +38,7 @@ class TaskResults {
 
   totalProcessFailures(): number {
     return this.results_.reduce((processFailures, result) => {
-      return !result.failedCount && result.exitCode !== 0 ?
-          processFailures + 1 :
-          processFailures;
+      return !result.failedCount && result.exitCode !== 0 ? processFailures + 1 : processFailures;
     }, 0);
   }
 
@@ -49,7 +48,6 @@ class TaskResults {
     }, []);
 
     let json = JSON.stringify(jsonOutput, null, '  ');
-    let fs = require('fs');
     fs.writeFileSync(filepath, json);
   }
 
@@ -58,15 +56,12 @@ class TaskResults {
     let processFailures = this.totalProcessFailures();
     this.results_.forEach((result: any) => {
       let capabilities = result.capabilities;
-      let shortName =
-          (capabilities.browserName) ? capabilities.browserName : '';
+      let shortName = (capabilities.browserName) ? capabilities.browserName : '';
       shortName = (capabilities.logName) ?
           capabilities.logName :
           (capabilities.browserName) ? capabilities.browserName : '';
       shortName += (capabilities.version) ? capabilities.version : '';
-      shortName += (capabilities.logName && capabilities.count < 2) ?
-          '' :
-          ' #' + result.taskId;
+      shortName += (capabilities.logName && capabilities.count < 2) ? '' : ' #' + result.taskId;
       if (result.failedCount) {
         logger.info(shortName + ' failed ' + result.failedCount + ' test(s)');
       } else if (result.exitCode !== 0) {
@@ -78,13 +73,12 @@ class TaskResults {
 
     if (specFailures && processFailures) {
       logger.info(
-          'overall: ' + specFailures + ' failed spec(s) and ' +
-          processFailures + ' process(es) failed to complete');
+          'overall: ' + specFailures + ' failed spec(s) and ' + processFailures +
+          ' process(es) failed to complete');
     } else if (specFailures) {
       logger.info('overall: ' + specFailures + ' failed spec(s)');
     } else if (processFailures) {
-      logger.info(
-          'overall: ' + processFailures + ' process(es) failed to complete');
+      logger.info('overall: ' + processFailures + ' process(es) failed to complete');
     }
   }
 }
@@ -118,7 +112,7 @@ let initFn = function(configFile: string, additionalConfig: Config) {
       .then(() => {
 
         return q
-            .Promise<any>((resolve: Function) => {
+            .Promise<any>((resolve: Function, reject: Function) => {
               // 1) If getMultiCapabilities is set, resolve that as
               // `multiCapabilities`.
               if (config.getMultiCapabilities &&
@@ -129,10 +123,17 @@ let initFn = function(configFile: string, additionalConfig: Config) {
                       'and multiCapabilities');
                 }
                 // If getMultiCapabilities is defined and a function, use this.
-                q.when(config.getMultiCapabilities(), (multiCapabilities) => {
-                   config.multiCapabilities = multiCapabilities;
-                   config.capabilities = null;
-                 }).then(() => resolve());
+                q(config.getMultiCapabilities())
+                    .then((multiCapabilities) => {
+                      config.multiCapabilities = multiCapabilities;
+                      config.capabilities = null;
+                    })
+                    .then(() => {
+                      resolve();
+                    })
+                    .catch(err => {
+                      reject(err);
+                    });
               } else {
                 resolve();
               }
@@ -161,8 +162,7 @@ let initFn = function(configFile: string, additionalConfig: Config) {
         // 3) If we're in `elementExplorer` mode, run only that.
         if (config.elementExplorer || config.framework === 'explorer') {
           if (config.multiCapabilities.length != 1) {
-            throw new Error(
-                'Must specify only 1 browser while using elementExplorer');
+            throw new Error('Must specify only 1 browser while using elementExplorer');
           } else {
             config.capabilities = config.multiCapabilities[0];
           }
@@ -196,9 +196,7 @@ let initFn = function(configFile: string, additionalConfig: Config) {
           let errorCode = ErrorHandler.parseError(e);
           if (errorCode) {
             let protractorError = e as ProtractorError;
-            ProtractorError.log(
-                logger, errorCode, protractorError.message,
-                protractorError.stack);
+            ProtractorError.log(logger, errorCode, protractorError.message, protractorError.stack);
             process.exit(errorCode);
           } else {
             logger.error(e.message);
@@ -220,9 +218,7 @@ let initFn = function(configFile: string, additionalConfig: Config) {
 
         // Run afterlaunch and exit
         let cleanUpAndExit = (exitCode: number) => {
-          return helper
-              .runFilenameOrFn_(
-                  config.configDir, config.afterLaunch, [exitCode])
+          return helper.runFilenameOrFn_(config.configDir, config.afterLaunch, [exitCode])
               .then(
                   (returned) => {
                     if (typeof returned === 'number') {
@@ -239,28 +235,24 @@ let initFn = function(configFile: string, additionalConfig: Config) {
 
         let totalTasks = scheduler.numTasksOutstanding();
         let forkProcess = false;
-        if (totalTasks >
-            1) {  // Start new processes only if there are >1 tasks.
+        if (totalTasks > 1) {  // Start new processes only if there are >1 tasks.
           forkProcess = true;
           if (config.debug) {
             throw new ConfigError(
-                logger,
-                'Cannot run in debug mode with multiCapabilities, count > 1, or sharding');
+                logger, 'Cannot run in debug mode with multiCapabilities, count > 1, or sharding');
           }
         }
 
         let deferred = q.defer<any>();  // Resolved when all tasks are completed
         let createNextTaskRunner = () => {
-          var task = scheduler.nextTask();
+          let task = scheduler.nextTask();
           if (task) {
-            let taskRunner =
-                new TaskRunner(configFile, additionalConfig, task, forkProcess);
+            let taskRunner = new TaskRunner(configFile, additionalConfig, task, forkProcess);
             taskRunner.run()
                 .then((result) => {
                   if (result.exitCode && !result.failedCount) {
                     logger.error(
-                        'Runner process exited unexpectedly with error code: ' +
-                        result.exitCode);
+                        'Runner process exited unexpectedly with error code: ' + result.exitCode);
                   }
                   taskResults_.add(result);
                   task.done();
@@ -270,12 +262,10 @@ let initFn = function(configFile: string, additionalConfig: Config) {
                     deferred.resolve();
                   }
                   logger.info(
-                      scheduler.countActiveTasks() +
-                      ' instance(s) of WebDriver still running');
+                      scheduler.countActiveTasks() + ' instance(s) of WebDriver still running');
                 })
                 .catch((err: Error) => {
-                  logger.error(
-                      'Error:', (err as any).stack || err.message || err);
+                  logger.error('Error:', (err as any).stack || err.message || err);
                   cleanUpAndExit(RUNNERS_FAILED_EXIT_CODE);
                 });
           }
@@ -284,12 +274,10 @@ let initFn = function(configFile: string, additionalConfig: Config) {
         // the beginning. As a worker finishes a task, it will pick up the next
         // task
         // from the scheduler's queue until all tasks are gone.
-        for (var i = 0; i < scheduler.maxConcurrentTasks(); ++i) {
+        for (let i = 0; i < scheduler.maxConcurrentTasks(); ++i) {
           createNextTaskRunner();
         }
-        logger.info(
-            'Running ' + scheduler.countActiveTasks() +
-            ' instances of WebDriver');
+        logger.info('Running ' + scheduler.countActiveTasks() + ' instances of WebDriver');
 
         // By now all runners have completed.
         deferred.promise

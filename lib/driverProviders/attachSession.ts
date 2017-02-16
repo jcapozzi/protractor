@@ -4,14 +4,14 @@
  *  it down, and setting up the driver correctly.
  */
 import * as q from 'q';
+import {promise as wdpromise, WebDriver} from 'selenium-webdriver';
 
 import {Config} from '../config';
 import {Logger} from '../logger';
 
 import {DriverProvider} from './driverProvider';
 
-let webdriver = require('selenium-webdriver');
-let executors = require('selenium-webdriver/executors');
+const http = require('selenium-webdriver/http');
 
 let logger = new Logger('attachSession');
 
@@ -22,11 +22,10 @@ export class AttachSession extends DriverProvider {
 
   /**
    * Configure and launch (if applicable) the object's environment.
-   * @public
    * @return {q.promise} A promise which will resolve when the environment is
    *     ready to test.
    */
-  setupEnv(): q.Promise<any> {
+  protected setupDriverEnv(): q.Promise<any> {
     logger.info('Using the selenium server at ' + this.config_.seleniumAddress);
     logger.info('Using session id - ' + this.config_.seleniumSessionId);
     return q(undefined);
@@ -38,10 +37,10 @@ export class AttachSession extends DriverProvider {
    * @public
    * @return {WebDriver} webdriver instance
    */
-  getNewDriver(): webdriver.WebDriver {
-    var executor = executors.createExecutor(this.config_.seleniumAddress);
-    var newDriver = webdriver.WebDriver.attachToSession(
-        executor, this.config_.seleniumSessionId);
+  getNewDriver(): WebDriver {
+    const httpClient = new http.HttpClient(this.config_.seleniumAddress);
+    const executor = new http.Executor(httpClient);
+    const newDriver = WebDriver.attachToSession(executor, this.config_.seleniumSessionId);
     this.drivers_.push(newDriver);
     return newDriver;
   }
@@ -51,9 +50,7 @@ export class AttachSession extends DriverProvider {
    *
    * @public
    */
-  quitDriver(): q.Promise<webdriver.WebDriver> {
-    let defer = q.defer<webdriver.WebDriver>();
-    defer.resolve(null);
-    return defer.promise;
+  quitDriver(): wdpromise.Promise<void> {
+    return wdpromise.when(undefined);
   }
 }

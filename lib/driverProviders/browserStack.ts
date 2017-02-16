@@ -5,6 +5,7 @@
  */
 import * as https from 'https';
 import * as q from 'q';
+import {Session, WebDriver} from 'selenium-webdriver';
 import * as util from 'util';
 
 import {Config} from '../config';
@@ -27,15 +28,13 @@ export class BrowserStack extends DriverProvider {
    * @return {q.promise} A promise that will resolve when the update is complete.
    */
   updateJob(update: any): q.Promise<any> {
-    let deferredArray = this.drivers_.map((driver: webdriver.WebDriver) => {
+    let deferredArray = this.drivers_.map((driver: WebDriver) => {
       let deferred = q.defer();
-      driver.getSession().then((session: webdriver.Session) => {
+      driver.getSession().then((session: Session) => {
         let headers: Object = {
           'Content-Type': 'application/json',
           'Authorization': 'Basic ' +
-              new Buffer(
-                  this.config_.browserstackUser + ':' +
-                  this.config_.browserstackKey)
+              new Buffer(this.config_.browserstackUser + ':' + this.config_.browserstackKey)
                   .toString('base64')
         };
         let options = {
@@ -48,12 +47,10 @@ export class BrowserStack extends DriverProvider {
 
         let req = https.request(options, (res) => {
           res.on('data', (data: Buffer) => {
-            var info = JSON.parse(data.toString());
-            if (info && info.automation_session &&
-                info.automation_session.browser_url) {
+            let info = JSON.parse(data.toString());
+            if (info && info.automation_session && info.automation_session.browser_url) {
               logger.info(
-                  'BrowserStack results available at ' +
-                  info.automation_session.browser_url);
+                  'BrowserStack results available at ' + info.automation_session.browser_url);
             } else {
               logger.info(
                   'BrowserStack results available at ' +
@@ -80,8 +77,7 @@ export class BrowserStack extends DriverProvider {
           });
           res.on('error', (e: Error) => {
             throw new BrowserError(
-                logger, 'Error updating BrowserStack pass/fail status: ' +
-                    util.inspect(e));
+                logger, 'Error updating BrowserStack pass/fail status: ' + util.inspect(e));
           });
         });
         update_req.write('{"status":"' + jobStatus + '"}');
@@ -94,29 +90,23 @@ export class BrowserStack extends DriverProvider {
 
   /**
    * Configure and launch (if applicable) the object's environment.
-   * @public
    * @return {q.promise} A promise which will resolve when the environment is
    *     ready to test.
    */
-  setupEnv(): q.Promise<any> {
-    var deferred = q.defer();
-    this.config_.capabilities['browserstack.user'] =
-        this.config_.browserstackUser;
-    this.config_.capabilities['browserstack.key'] =
-        this.config_.browserstackKey;
+  protected setupDriverEnv(): q.Promise<any> {
+    let deferred = q.defer();
+    this.config_.capabilities['browserstack.user'] = this.config_.browserstackUser;
+    this.config_.capabilities['browserstack.key'] = this.config_.browserstackKey;
     this.config_.seleniumAddress = 'http://hub.browserstack.com/wd/hub';
 
     // Append filename to capabilities.name so that it's easier to identify
     // tests.
-    if (this.config_.capabilities.name &&
-        this.config_.capabilities.shardTestFiles) {
+    if (this.config_.capabilities.name && this.config_.capabilities.shardTestFiles) {
       this.config_.capabilities.name +=
           (':' + this.config_.specs.toString().replace(/^.*[\\\/]/, ''));
     }
 
-    logger.info(
-        'Using BrowserStack selenium server at ' +
-        this.config_.seleniumAddress);
+    logger.info('Using BrowserStack selenium server at ' + this.config_.seleniumAddress);
     deferred.resolve();
     return deferred.promise;
   }

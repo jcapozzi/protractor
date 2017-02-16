@@ -11,12 +11,12 @@ What's the difference between Karma and Protractor? When do I use which?
 ---------------------------------------------------
 
 [Karma](http://karma-runner.github.io) is a great tool for unit testing, and Protractor is intended for
-end to end or integration testing. This means that small tests for the logic
+end-to-end or integration testing. This means that small tests for the logic
 of your individual controllers, directives, and services should be run using
 Karma. Big tests in which you have a running instance of your entire application
 should be run using Protractor. Protractor is intended to run tests from a
 user's point of view - if your test could be written down as instructions
-for a human interacting with your application, it should be an end to end test
+for a human interacting with your application, it should be an end-to-end test
 written with Protractor.
 
 Here's a [great blog post](http://www.yearofmoo.com/2013/09/advanced-testing-and-debugging-in-angularjs.html)
@@ -25,18 +25,21 @@ with more info.
 Angular can't be found on my page
 ---------------------------------
 
-Protractor supports angular 1.0.6/1.1.4 and higher - check that your version of Angular is upgraded.
+Protractor supports Angular and AngularJS 1.0.6/1.1.4 and higher - check that your version of Angular is upgraded.
 
-The `angular` variable is expected to be available in the global context. Try opening chrome devtools or firefox and see if `angular` is defined.
+For AngularJS apps, the `angular` variable is expected to be available in the global context. Try opening chrome devtools or firefox and see if `angular` is defined.
+
+For Angular apps, you should see a global method `getAllAngularTestabilities`.
 
 How do I deal with my log-in page?
 ----------------------------------
 
 If your app needs log-in, there are a couple ways to deal with it. If your login
 page is not written with Angular, you'll need to interact with it via 
-unwrapped webdriver, which can be accessed like `browser.driver.get()`. 
+unwrapped webdriver, which can be accessed like `browser.driver.get()`. You can also use
+`browser.ignoreSynchronization` as explained [here](/docs/timeouts.md#how-to-disable-waiting-for-angular).
 
-You can put your log-in code into an `onPrepare` function, which will be run
+Another option is to put your log-in code into an `onPrepare` function, which will be run
 once before any of your tests. See this example ([withLoginConf.js](https://github.com/angular/protractor/blob/master/spec/withLoginConf.js))
 
 Which browsers are supported?
@@ -49,6 +52,13 @@ The result of `getText` from an input element is always empty
 This is a [webdriver quirk](http://grokbase.com/t/gg/webdriver/12bcmvwhcm/extarcting-text-from-the-input-field).
 `<input>` and `<textarea>` elements always have
 empty `getText` values. Instead, try `element.getAttribute('value')`.
+
+How can I drag and drop elements?
+---------------------------------
+You can specify a sequence of [actions](http://www.protractortest.org/#/api?view=webdriver.WebDriver.prototype.actions)
+to drag an drop elements.  Note mouse actions do not work on Chrome with the HTML5 Drag and Drop API due to a known
+[Chromedriver issue](https://bugs.chromium.org/p/chromedriver/issues/detail?id=841)
+
 
 How can I interact directly with the JavaScript running in my app?
 ------------------------------------------------------------------
@@ -164,10 +174,6 @@ If you need to test file upload on a remote server (such as Sauce Labs), [you ne
 var remote = require('selenium-webdriver/remote');
 browser.setFileDetector(new remote.FileDetector());
 ```
-
-Why is browser.debugger(); not pausing the test?
------------------------------------------------
-The most likely reason is that you are not running the test in debug mode. To do this you run: `protractor debug` followed by the path to your protractor configuration file.
 
 I get an error: Page reload detected during async script. What does this mean?
 ------------------------------------------------------------------------------

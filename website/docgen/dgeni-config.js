@@ -14,6 +14,7 @@ jsDocProcessor.config(function(parseTagsProcessor) {
   tagDefs.push({name: 'deprecated'});
   tagDefs.push({name: 'example'});
   tagDefs.push({name: 'extends'});
+  tagDefs.push({name: 'external'});
   tagDefs.push({name: 'private'});
   tagDefs.push({name: 'type'});
   tagDefs.push({name: 'view'});
@@ -76,7 +77,8 @@ myPackage.config(function(readFilesProcessor, templateFinder, writeFilesProcesso
     {include: 'built/locators.js'},
     {include: 'built/expectedConditions.js'},
     {include: 'lib/selenium-webdriver/locators.js'},
-    {include: 'lib/selenium-webdriver/webdriver.js'}
+    {include: 'lib/selenium-webdriver/webdriver.js'},
+    {include: 'lib/webdriver-js-extender/index.js'}
   ];
 
   // Add a folder to search for our own templates to use when rendering docs

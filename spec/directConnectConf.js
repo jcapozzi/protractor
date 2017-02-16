@@ -5,11 +5,10 @@ exports.config = {
   directConnect: true,
 
   framework: 'jasmine',
-
   multiCapabilities: [{
     'browserName': 'chrome'
   }, {
-    'browserName': 'firefox'
+    'browserName': 'firefox',
   }],
 
   baseUrl: env.baseUrl + '/ng1/',

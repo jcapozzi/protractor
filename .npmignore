@@ -1,22 +1,39 @@
+# Shared between .npmignore and .gitignore
+
+chromedriver.log
+libpeerconnection.log
+xmloutput*
+npm-debug.log
+.idea/
+.vscode/
+*.DS_Store
+*.swp
+selenium/
+
+# Development folders
+
+.github/
+built/spec/
 debugging/
 docs/
 lib/
 scripts/
 spec/
 stress/
-selenium/
 testapp/
-typings/
 website/
+exampleTypescript/*.js
+exampleTypescript/node_modules/
+exampleTypescript/tmp/
 
+# Development files
+
+.clang-format
 .gitattributes
-.github/
 .gitignore
 .jshintrc
 .npmignore
 .travis.yml
-chromedriver.log
-libpeerconnection.log
-npm-debug.log
-xmloutput*
+circle.yml
+logo.svg
 release.md

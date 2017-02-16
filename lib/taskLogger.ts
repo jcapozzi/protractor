@@ -62,20 +62,17 @@ export class TaskLogger {
    * @param {string} data
    */
   public log(data: string): void {
-    var tag = '[';
-    var capabilities = this.task.capabilities;
-    tag += (capabilities.logName) ?
-        capabilities.logName :
-        (capabilities.browserName) ? capabilities.browserName : '';
+    let tag = '[';
+    let capabilities = this.task.capabilities;
+    tag += (capabilities.logName) ? capabilities.logName :
+                                    (capabilities.browserName) ? capabilities.browserName : '';
     tag += (capabilities.version) ? (' ' + capabilities.version) : '';
     tag += (capabilities.platform) ? (' ' + capabilities.platform) : '';
-    tag += (capabilities.logName && capabilities.count < 2) ?
-        '' :
-        ' #' + this.task.taskId;
+    tag += (capabilities.logName && capabilities.count < 2) ? '' : ' #' + this.task.taskId;
     tag += '] ';
 
     data = data.toString();
-    for (var i = 0; i < data.length; i++) {
+    for (let i = 0; i < data.length; i++) {
       if (this.insertTag) {
         this.insertTag = false;
         // This ensures that the '\x1B[0m' appears before the tag, so that
