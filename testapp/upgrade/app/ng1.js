@@ -30,20 +30,20 @@ function Ng1Directive() {
     };
 }
 exports.Ng1Directive = Ng1Directive;
-var core_1 = require('@angular/core');
-var static_1 = require('@angular/upgrade/static');
+var core_1 = require("@angular/core");
+var static_1 = require("@angular/upgrade/static");
 var Ng1Component = (function (_super) {
     __extends(Ng1Component, _super);
     function Ng1Component(elementRef, injector) {
-        _super.call(this, 'ng1', elementRef, injector);
+        return _super.call(this, 'ng1', elementRef, injector) || this;
     }
-    Ng1Component = __decorate([
-        core_1.Directive({
-            selector: 'ng1'
-        }), 
-        __metadata('design:paramtypes', [core_1.ElementRef, core_1.Injector])
-    ], Ng1Component);
     return Ng1Component;
 }(static_1.UpgradeComponent));
+Ng1Component = __decorate([
+    core_1.Directive({
+        selector: 'ng1'
+    }),
+    __metadata("design:paramtypes", [core_1.ElementRef, core_1.Injector])
+], Ng1Component);
 exports.Ng1Component = Ng1Component;
 //# sourceMappingURL=ng1.js.map

@@ -8,7 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var core_1 = require('@angular/core');
+var core_1 = require("@angular/core");
 var AsyncComponent = (function () {
     function AsyncComponent(_ngZone) {
         this._ngZone = _ngZone;
@@ -96,13 +96,13 @@ var AsyncComponent = (function () {
         }
     };
     ;
-    AsyncComponent = __decorate([
-        core_1.Component({
-            templateUrl: 'app/async/async.component.html',
-        }), 
-        __metadata('design:paramtypes', [core_1.NgZone])
-    ], AsyncComponent);
     return AsyncComponent;
 }());
+AsyncComponent = __decorate([
+    core_1.Component({
+        templateUrl: 'app/async/async.component.html',
+    }),
+    __metadata("design:paramtypes", [core_1.NgZone])
+], AsyncComponent);
 exports.AsyncComponent = AsyncComponent;
 //# sourceMappingURL=async.component.js.map
